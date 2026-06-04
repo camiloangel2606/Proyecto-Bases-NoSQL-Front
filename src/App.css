@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+:root {
+  --netflix-red: #E50914;
+  --dark-bg: #0f0f0f;
+  --card-bg: #181818;
+  --glass: rgba(255, 255, 255, 0.05);
+  --text-main: #ffffff;
+  --text-dim: #b3b3b3;
+}
+
+* { margin: 0; padding: 0; box-box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+body { background-color: var(--dark-bg); color: var(--text-main); overflow-x: hidden; }
+
+/* Header Estilo Cine */
+.header-netflix {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 60px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.logo-grande {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--netflix-red);
+  letter-spacing: -2px;
+  text-transform: uppercase;
+}
+
+.logo-grande span { color: white; font-weight: 300; margin-left: 8px; }
+
+.nav-actions { display: flex; gap: 15px; }
+
+.btn-nav {
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-nav:hover { background: white; color: black; }
+.btn-nav.primary { background: var(--netflix-red); border: none; }
+.btn-nav.primary:hover { background: #ff0a16; color: white; }
+
+/* Dashboard Layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  padding: 40px 60px;
+}
+
+/* Sidebar de Consultas (Las 15 tareas) */
+.sidebar-queries {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+.query-group { margin-bottom: 25px; }
+.query-group h5 { 
+  color: var(--netflix-red); 
+  font-size: 0.75rem; 
+  text-transform: uppercase; 
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.btn-query {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.btn-query:hover { color: white; padding-left: 5px; }
+
+/* Grid de Películas Moderno */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 25px;
+}
+
+.movie-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  border: 1px solid transparent;
+  overflow: hidden;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.card-img-placeholder {
+  height: 140px;
+  background: linear-gradient(45deg, #1a1a1a, #333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--netflix-red);
+  font-weight: bold;
+}
+
+.card-body { padding: 15px; }
+.card-body h4 { margin-bottom: 8px; font-size: 1rem; }
+.card-body p { font-size: 0.8rem; color: var(--text-dim); line-height: 1.4; }
+
+.card-footer {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Modales */
+.modal-overlay {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: #111;
+  padding: 40px;
+  border-radius: 12px;
+  width: 450px;
+  border: 1px solid #333;
+}
+
+.modal-content h3 { margin-bottom: 20px; color: var(--netflix-red); }
+
+.diseno-form input, .diseno-form select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  background: #222;
+  border: 1px solid #333;
+  color: white;
+  border-radius: 4px;
+}
+
+/* Tarjetas específicas para Visualizaciones */
+.view-card {
+  background: var(--card-bg);
+  border-left: 4px solid var(--netflix-red);
+  padding: 20px;
+  border-radius: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.view-header { 
+  color: var(--netflix-red); 
+  font-weight: bold; 
+  margin-bottom: 12px; 
+  font-size: 0.85rem; 
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #222; 
+  padding-bottom: 6px; 
+}
+.view-body p { font-size: 0.85rem; margin-bottom: 6px; color: var(--text-dim); }
+.view-body strong { color: white; }
+.rating-stars { color: #ffc107; font-weight: bold; margin-top: 12px; font-size: 0.95rem; }
+
+/* Modal de información expandida de Títulos */
+.detail-modal {
+  width: 600px !important;
+  max-width: 90vw;
+  position: relative;
+  border-top: 3px solid var(--netflix-red);
+}
+.close-btn {
+  position: absolute; top: 15px; right: 20px;
+  background: none; border: none; color: var(--text-dim); font-size: 1.8rem; cursor: pointer;
+  transition: 0.2s;
+}
+.close-btn:hover { color: white; }
+.detail-header h2 { font-size: 2rem; margin-top: 10px; font-weight: 900; color: white; }
+.detail-info { margin-top: 25px; }
+.detail-info p { font-size: 0.95rem; margin-bottom: 10px; color: var(--text-dim); line-height: 1.5; }
+.detail-info strong { color: white; margin-right: 4px; }
+.type-tag {
+  background: rgba(233, 9, 20, 0.2);
+  color: var(--netflix-red);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.description-box {
+  background: rgba(255,255,255,0.03);
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.view-card {
+  background: #1a1a1a;
+  border-left: 4px solid #e50914;
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.view-card:hover { transform: scale(1.02); background: #222; }
+.detail-modal { width: 600px; max-width: 90vw; }
+.rating-stars { color: #ffc107; font-weight: bold; margin-top: 5px; }
+
+/* Heredar animación de movie-card para visualizaciones */
+.view-card {
+  cursor: pointer;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.view-card:hover {
+  transform: scale(1.05);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* Estilo para los botones de iconos en las tarjetas */
+.icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.icon-btn:hover { background: var(--netflix-red); transform: translateY(-2px); }
+.icon-btn.del:hover { background: #900; }
+
+/* Tabla de reporte */
+.report-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.report-table th { text-align: left; color: var(--netflix-red); padding: 15px; border-bottom: 2px solid #222; }
+.report-table td { padding: 15px; border-bottom: 1px solid #222; color: var(--text-dim); }
+.gold-text { color: #ffc107; font-weight: bold; }

@@ -5,7 +5,8 @@ import './App.css'
 
 function App() {
   const [titulos, setTitulos] = useState([]);
-  const [reporte, setReporte] = useState([]);
+  const [reporte, setReporte] = useState([]); // Agregación 1: Vistas
+  const [reporteCalidad, setReporteCalidad] = useState([]); // Agregación 2: Calificaciones
   const [modo, setModo] = useState('grid');
   const [modal, setModal] = useState({ abierto: false, tipo: null });
   const [seleccionado, setSeleccionado] = useState(null); 
@@ -26,7 +27,6 @@ function App() {
 
   const guardarPost = async (datos) => {
     try {
-      // Ruta según tu backend: POST /titulos o POST /visualizaciones
       const ruta = modal.tipo === 'titulo' ? '/titulos' : '/visualizaciones';
       await clienteAxios.post(ruta, datos);
       alert("✅ Registro exitoso");
@@ -39,7 +39,6 @@ function App() {
     const valor = prompt(`Ingrese el nuevo ${tipo === 'genero' ? 'Género' : 'Actor'}:`);
     if (!valor) return;
     try {
-      // Rutas: /titulos/agregar-genero/:id y /titulos/agregar-actor/:id
       const ruta = tipo === 'genero' ? 'agregar-genero' : 'agregar-actor';
       const payload = tipo === 'genero' ? { genero: valor } : { actor: valor };
       await clienteAxios.put(`/titulos/${ruta}/${id}`, payload);
@@ -54,7 +53,6 @@ function App() {
     const nota = prompt("Nueva calificación (1-5):");
     if (!nota) return;
     try {
-      // Ruta: PATCH /visualizaciones/calificacion/:id
       await clienteAxios.patch(`/visualizaciones/calificacion/${idVista}`, { 
         nueva_calificacion: Number(nota) 
       });
@@ -66,7 +64,6 @@ function App() {
     const nueva = prompt("Nueva clasificación (ej: TV-MA):");
     if (!nueva) return;
     try {
-      // Ruta: PATCH /titulos/actualizar-edad/:id
       await clienteAxios.patch(`/titulos/actualizar-edad/${id}`, { nueva_edad: nueva });
       alert("🆙 Clasificación actualizada");
       cargarDatos();
@@ -77,14 +74,12 @@ function App() {
 
   const consultaEspecial = async (tipo, placeholder) => {
     let valor = "";
-    // Solo pide prompt si no es una ruta fija
     if (tipo !== 'tipo/pelicula' && tipo !== 'tipo/serie') {
       valor = prompt(`Ingrese ${placeholder}:`);
       if (!valor) return;
     }
     
     try {
-      // Nota: Para /tipo/serie DEBES agregar la ruta en tu backend similar a la de pelicula
       const res = await clienteAxios.get(`/titulos/${tipo}${valor ? '/' + valor : ''}`);
       setTitulos(res.data);
       setModo('grid');
@@ -95,20 +90,25 @@ function App() {
     const p = prompt(`Ingrese ${tipo === 'pais' ? 'el País' : 'el id_titulo (ej: s56)'}:`);
     if (!p) return;
     try {
-      // Rutas: /visualizaciones/pais/:pais o /visualizaciones/titulo/:id
       const res = await clienteAxios.get(`/visualizaciones/${tipo}/${p}`);
       setVisualizaciones(res.data);
       setModo('vistas');
     } catch (err) { alert("❌ Error en la consulta de vistas"); }
   };
 
+  // NUEVA LÓGICA: Ejecuta ambas agregaciones para el reporte
   const verRanking = async () => {
     try {
-      // Ruta: GET /reporte/conteo-visualizaciones
-      const res = await clienteAxios.get('/reporte/conteo-visualizaciones');
-      setReporte(res.data);
+      // Llamada a Agregación 1 (Vistas) y Agregación 2 (Calidad)
+      const [resVistas, resCalidad] = await Promise.all([
+        clienteAxios.get('/reporte/conteo-visualizaciones'),
+        clienteAxios.get('/reporte/mejores-calificados')
+      ]);
+      
+      setReporte(resVistas.data);
+      setReporteCalidad(resCalidad.data);
       setModo('reporte');
-    } catch (err) { alert("❌ Error al generar reporte"); }
+    } catch (err) { alert("❌ Error al generar reportes"); }
   };
 
   // --- 3. OPERACIÓN DE ELIMINACIÓN ---
@@ -116,18 +116,14 @@ function App() {
   const borrar = async (id) => {
     if (confirm("¿Eliminar título definitivamente?")) {
       try {
-        // Ruta: DELETE /titulos/:id
         await clienteAxios.delete(`/titulos/${id}`);
         cargarDatos();
       } catch (err) { alert("❌ Error al borrar"); }
     }
   };
 
-  // Lógica para el clic en tarjetas de visualización (Ver detalles)
   const verDetalleDesdeVista = async (idTitulo) => {
     try {
-        // Importante: Tu back necesita la ruta GET /titulos/id/:id 
-        // para buscar por id_titulo y no por ObjectId
         const res = await clienteAxios.get(`/titulos`); 
         const encontrado = res.data.find(t => t.id_titulo === idTitulo);
         if(encontrado) setSeleccionado(encontrado);
@@ -141,7 +137,7 @@ function App() {
         <div className="logo-grande" onClick={cargarDatos} style={{cursor: 'pointer'}}>PLATAFORMA<span>STREAMING</span></div>
         <div className="nav-actions">
           <button className="btn-nav primary" onClick={() => setModal({ abierto: true, tipo: 'titulo' })}>+ Nuevo Título</button>
-          <button className="btn-nav" onClick={() => setModal({ abierto: true, tipo: 'visualizacion' })}>+ Registrar Vista</button>
+          <button className="btn-nav" onClick={() => setModal({ abierto: true, tipo: 'visualizacion' })}>+ Registrar Visualización</button>
         </div>
       </header>
 
@@ -158,7 +154,7 @@ function App() {
 
           <div className="query-group">
             <h5>📊 Análisis de Vistas</h5>
-            <button className="btn-query" onClick={verRanking}>⭐ Ranking de Popularidad</button>
+            <button className="btn-query" onClick={verRanking}>⭐ Popularidad y mejores calificados (agregaciones)</button>
             <button className="btn-query" onClick={() => verVisualizacionesPorFiltro('pais')}>📍 Vistas por País</button>
             <button className="btn-query" onClick={() => verVisualizacionesPorFiltro('titulo')}>📺 Vistas por ID Título</button>
           </div>
@@ -208,18 +204,43 @@ function App() {
             </div>
           )}
 
+          {/* VISTA DE REPORTES ACTUALIZADA (AMBAS AGREGACIONES) */}
           {modo === 'reporte' && (
             <div className="report-view">
-              <h2>🏆 Ranking de Popularidad</h2>
-              <table className="report-table">
-                <thead><tr><th>ID Título</th><th>Estado</th><th>Vistas</th></tr></thead>
-                <tbody>
-                  {reporte.map(r => (
-                    <tr key={r._id}><td>{r._id}</td><td>{r.total > 5 ? '🔥' : '💎'}</td><td className="gold-text">{r.total} vistas</td></tr>
-                  ))}
-                </tbody>
-              </table>
-              <button className="btn-nav primary" style={{marginTop:'20px'}} onClick={cargarDatos}>Regresar</button>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px'}}>
+                
+                {/* Agregación 1: Ranking Vistas */}
+                <div>
+                  <h2 style={{color: '#E50914'}}>🏆 Lista de Popularidad</h2>
+                  <table className="report-table">
+                    <thead><tr><th>ID Título</th><th>Vistas</th></tr></thead>
+                    <tbody>
+                      {reporte.map(r => (
+                        <tr key={r._id}><td>{r._id}</td><td className="gold-text">{r.total} vistas {r.total > 5 ? '🔥' : ''}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Agregación 2: Ranking Calidad */}
+                <div>
+                  <h2 style={{color: '#FFD700'}}>⭐ Top 5 Mejor Calificados</h2>
+                  <table className="report-table">
+                    <thead><tr><th>ID Título</th><th>Promedio</th><th>Votos</th></tr></thead>
+                    <tbody>
+                      {reporteCalidad.map(q => (
+                        <tr key={q._id}>
+                          <td>{q._id}</td>
+                          <td style={{color: '#FFD700', fontWeight: 'bold'}}>{q.promedio} / 5</td>
+                          <td>{q.totalVotos}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+              <button className="btn-nav primary" style={{marginTop:'30px'}} onClick={cargarDatos}>Regresar al catálogo</button>
             </div>
           )}
         </main>

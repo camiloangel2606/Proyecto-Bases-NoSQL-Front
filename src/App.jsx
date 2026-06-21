@@ -124,9 +124,9 @@ function App() {
 
   const verDetalleDesdeVista = async (idTitulo) => {
     try {
-        const res = await clienteAxios.get(`/titulos`); 
-        const encontrado = res.data.find(t => t.id_titulo === idTitulo);
-        if(encontrado) setSeleccionado(encontrado);
+        // Consulta directa por ID (antes traía TODO el catálogo y se congelaba)
+        const res = await clienteAxios.get(`/titulos/id/${idTitulo}`);
+        if(res.data) setSeleccionado(res.data);
         else alert("Detalles no disponibles para este ID");
     } catch (err) { console.log(err); }
   };
